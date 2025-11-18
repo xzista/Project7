@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Le Jardin Secret - Изысканная французская кухня{% endblock %}
 
@@ -29,45 +30,45 @@
     </div>
 </section>
 
-<!-- История ресторана -->
-<section class="py-5 bg-body-tertiary theme-transition">
-    <div class="container">
+<!-- История ресторана с фоновым изображением -->
+<section id="about" class="py-5 position-relative overflow-hidden theme-transition" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{% static 'images/photo.png' %}') center/cover no-repeat fixed; min-height: 100vh; display: flex; align-items: center;">
+    <div class="container position-relative z-1">
         <div class="row">
             <div class="col-lg-8 mx-auto text-center">
-                <h2 class="display-4 fw-bold mb-5">Наша История</h2>
+                <h2 class="display-4 fw-bold mb-5 text-white">Наша История</h2>
 
                 <div class="row text-start">
                     <div class="col-md-6 timeline-item mb-4">
-                        <div class="card culinary-card h-100">
+                        <div class="card culinary-card h-100 glass-effect text-white">
                             <div class="card-body">
-                                <h4 class="text-primary">1985</h4>
+                                <h4 class="text-warning">1985</h4>
                                 <h5>Рождение мечты</h5>
                                 <p>Шеф-повар Пьер Дюбуа открыл небольшое кафе в Париже, где впервые представил свои уникальные рецепты, передаваемые в семье из поколения в поколение.</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 timeline-item mb-4">
-                        <div class="card culinary-card h-100">
+                        <div class="card culinary-card h-100 glass-effect text-white">
                             <div class="card-body">
-                                <h4 class="text-primary">1998</h4>
+                                <h4 class="text-warning">1998</h4>
                                 <h5>Мировое признание</h5>
                                 <p>Le Jardin Secret получает первую звезду Мишлен. Наши блюда покоряют сердца гурманов со всего мира своей аутентичностью и изысканностью.</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 timeline-item mb-4">
-                        <div class="card culinary-card h-100">
+                        <div class="card culinary-card h-100 glass-effect text-white">
                             <div class="card-body">
-                                <h4 class="text-primary">2010</h4>
+                                <h4 class="text-warning">2010</h4>
                                 <h5>Новая глава</h5>
                                 <p>Ресторан переезжает в историческое здание XIX века, где каждая деталь интерьера рассказывает свою собственную историю французского искусства.</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 timeline-item mb-4">
-                        <div class="card culinary-card h-100">
+                        <div class="card culinary-card h-100 glass-effect text-white">
                             <div class="card-body">
-                                <h4 class="text-primary">2024</h4>
+                                <h4 class="text-warning">2024</h4>
                                 <h5>Современная классика</h5>
                                 <p>Сохраняя традиции, мы внедряем инновации. Сегодня Le Jardin Secret - это синтез вековых рецептов и современных гастрономических тенденций.</p>
                             </div>
@@ -80,7 +81,7 @@
 </section>
 
 <!-- Особенности -->
-<section class="py-5 theme-transition">
+<section class="py-5 theme-transition" id="features">
     <div class="container">
         <h2 class="display-4 fw-bold text-center mb-5">Почему выбирают нас</h2>
 
@@ -125,7 +126,7 @@
 </section>
 
 <!-- Галерея блюд -->
-<section class="py-5 bg-body-tertiary theme-transition">
+<section id="menu" class="py-5 bg-body-tertiary theme-transition">
     <div class="container">
         <h2 class="display-4 fw-bold text-center mb-5">Шедевры нашей кухни</h2>
 
@@ -189,7 +190,7 @@
 </section>
 
 <!-- Отзывы -->
-<section class="py-5 theme-transition">
+<section id="reviews" class="py-5 theme-transition">
     <div class="container">
         <h2 class="display-4 fw-bold text-center mb-5">Отзывы гостей</h2>
 
