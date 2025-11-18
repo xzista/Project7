@@ -28,27 +28,29 @@ class BookingForm(forms.ModelForm):
         table = cleaned_data.get("table")
         date_val = cleaned_data.get("date")
         time_val = cleaned_data.get("time")
+        duration_hours = cleaned_data.get("duration_hours")
         number_of_guests = cleaned_data.get("number_of_guests")
 
         if table and number_of_guests and number_of_guests > table.capacity:
-            raise forms.ValidationError(
-                f"Выбранный стол вмещает максимум {table.capacity} гостей."
+            raise forms.ValidationError(f"Выбранный стол вмещает максимум {table.capacity} гостей.")
+
+        if table and date_val and time_val and duration_hours:
+            # формируем новый временной интервал
+            import datetime
+            new_start = datetime.datetime.combine(date_val, time_val)
+            new_end = new_start + datetime.timedelta(hours=duration_hours)
+
+            # ищем потенциально конфликтующие брони для этого стола в тот же день
+            qs = Booking.objects.filter(table=table, date=date_val).exclude(pk=self.instance.pk if self.instance else None).filter(
+                status__in=[Booking.STATUS_CREATED, Booking.STATUS_CONFIRMED]
             )
 
-        if table and date_val and time_val:
-            # Проверяем, не занят ли стол на это время
-            conflicting_booking = Booking.objects.filter(
-                table=table,
-                date=date_val,
-                time=time_val,
-                status__in=[Booking.STATUS_CREATED, Booking.STATUS_CONFIRMED]
-            ).exclude(pk=self.instance.pk if self.instance else None)
-
-            if conflicting_booking.exists():
-                raise forms.ValidationError(
-                    "Этот стол уже забронирован на выбранное время. Пожалуйста, выберите другое время или стол."
-                )
-
+            for existing in qs:
+                existing_start = datetime.datetime.combine(existing.date, existing.time)
+                existing_end = existing_start + datetime.timedelta(hours=existing.duration_hours)
+                # пересечение интервалов
+                if not (new_end <= existing_start or new_start >= existing_end):
+                    raise forms.ValidationError("Этот стол занят в выбранный интервал. Пожалуйста, выберите другое время или стол.")
         return cleaned_data
 
 class BookingUpdateForm(BookingForm):
