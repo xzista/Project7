@@ -1,36 +1,113 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Ресторан - Бронирование столиков{% endblock %}</title>
+    <title>{% block title %}Le Jardin Secret - Ресторан французской кухни{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .theme-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .hero-gradient-dark {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+        .culinary-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            overflow: hidden;
+        }
+        .culinary-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .floating-animation {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .glass-effect-dark {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+        .timeline-item-dark::before {
+            background: linear-gradient(to bottom, #3498db, #2c3e50);
+        }
+    </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body class="theme-transition">
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark theme-transition">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-utensils"></i> Ресторан
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                <i class="fas fa-crown me-2"></i>Le Jardin Secret
             </a>
 
-            <div class="navbar-nav ms-auto">
-                {% if user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'bookings:booking_list' %}">Мои бронирования</a>
-                    <a class="nav-link" href="{% url 'bookings:booking_create' %}">Забронировать</a>
-                    {% if user.is_staff %}
-                        <a class="nav-link text-warning" href="{% url 'admin:index' %}">Админка</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'bookings:booking_list' %}">
+                            <i class="fas fa-calendar-alt me-1"></i>Мои бронирования
+                        </a>
+                        <a class="nav-link" href="{% url 'bookings:booking_create' %}">
+                            <i class="fas fa-plus-circle me-1"></i>Забронировать
+                        </a>
+                        {% if user.is_staff %}
+                            <a class="nav-link text-warning" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog me-1"></i>Админка
+                            </a>
+                        {% endif %}
+                        <a class="nav-link" href="{% url 'users:logout' %}">
+                            <i class="fas fa-sign-out-alt me-1"></i>Выйти
+                        </a>
+                    {% else %}
+                        <a class="nav-link" href="{% url 'users:login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Войти
+                        </a>
+                        <a class="nav-link" href="{% url 'users:register' %}">
+                            <i class="fas fa-user-plus me-1"></i>Регистрация
+                        </a>
                     {% endif %}
-                    <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
-                {% else %}
-                    <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
-                    <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
-                {% endif %}
+
+                    <!-- Переключатель темы -->
+                    <button class="btn btn-outline-light ms-2 theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <main>
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -44,12 +121,60 @@
         {% endblock %}
     </main>
 
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2025 Ресторан. Все права защищены.</p>
+    <footer class="bg-dark text-light py-4 mt-5 theme-transition">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-crown me-2"></i>Le Jardin Secret</h5>
+                    <p>Изысканная французская кухня в сердце города</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Контакты</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>ул. Гастрономическая, 42</p>
+                    <p><i class="fas fa-phone me-2"></i>+7 (495) 123-45-67</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Часы работы</h5>
+                    <p>Пн-Чт: 12:00 - 23:00</p>
+                    <p>Пт-Вс: 12:00 - 00:00</p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2024 Le Jardin Secret. Все права защищены.</p>
+            </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Переключение темы
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Проверяем сохраненную тему
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        function setTheme(theme) {
+            htmlElement.setAttribute('data-bs-theme', theme);
+            const icon = themeToggle.querySelector('i');
+
+            if (theme === 'dark') {
+                icon.className = 'fas fa-sun';
+                themeToggle.title = 'Переключить на светлую тему';
+            } else {
+                icon.className = 'fas fa-moon';
+                themeToggle.title = 'Переключить на темную тему';
+            }
+        }
+    </script>
 </body>
 </html>
