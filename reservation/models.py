@@ -49,7 +49,7 @@ class Booking(models.Model):
         verbose_name="Пользователь"
     )
     table = models.ForeignKey(
-        "restaurant.Table",
+        RestaurantTable,
         on_delete=models.CASCADE,
         verbose_name="Стол"
     )
@@ -61,7 +61,7 @@ class Booking(models.Model):
         verbose_name="Продолжительность (часы)"
     )
     number_of_guests = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(20)],
+        validators=[MinValueValidator(1), MaxValueValidator(8)],
         verbose_name="Количество гостей"
     )
     special_requests = models.TextField(

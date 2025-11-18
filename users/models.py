@@ -9,12 +9,19 @@ class User(AbstractUser):
 
     token = models.CharField(max_length=100, verbose_name='Token', blank=True, null=True,)
 
+    is_customer = models.BooleanField(default=True, verbose_name='Обычный пользователь')
+    is_restaurant_admin = models.BooleanField(default=False, verbose_name='Администратор ресторана')
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        permissions = [
+            ("can_manage_bookings", "Can manage all bookings"),
+            ("can_view_all_bookings", "Can view all bookings"),
+        ]
 
     def __str__(self):
         return self.email
