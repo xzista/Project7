@@ -96,18 +96,18 @@ jobs:
             EOF
             
             echo "--- CLEAN DOCKER ---"
-            docker system prune -af --volumes
+            sudo docker system prune -af --volumes
             
             echo "--- BUILD AND START CONTAINERS ---"
-            docker compose -f docker-compose.yaml down || true
-            docker compose -f docker-compose.yaml build --no-cache
-            docker compose -f docker-compose.yaml up -d
+            sudo docker compose -f docker-compose.yaml down || true
+            sudo docker compose -f docker-compose.yaml build --no-cache
+            sudo docker compose -f docker-compose.yaml up -d
             
             echo "--- WAIT FOR DATABASE ---"
             sleep 30
             
             echo "--- APPLY MIGRATIONS ---"
-            docker compose -f docker-compose.yaml exec -T web python manage.py migrate --noinput
+            sudo docker compose -f docker-compose.yaml exec -T web python manage.py migrate --noinput
             
             echo "--- CHECK DEPLOYMENT ---"
             sleep 10
