@@ -1,9 +1,6 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 
-{% block title %}
-{% if form.instance.pk %}Перенести бронирование{% else %}Новое бронирование{% endif %}
-{% endblock %}
+{% block title %}{% if form.instance.pk %}Перенести бронирование{% else %}Новое бронирование{% endif %}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -11,37 +8,122 @@
         <div class="col-lg-8">
             <div class="card glass-effect p-4 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="mb-0">
                             {% if form.instance.pk %}
-                                Перенести / изменить бронирование
+                                <i class="fas fa-edit me-2"></i>Перенести бронирование
                             {% else %}
-                                Забронировать столик
+                                <i class="fas fa-calendar-plus me-2"></i>Забронировать столик
                             {% endif %}
                         </h3>
                         {% if form.instance.pk %}
-                            <small class="text-muted">Бронь #{{ form.instance.pk }}</small>
+                            <span class="badge bg-secondary">Бронь #{{ form.instance.pk }}</span>
                         {% endif %}
                     </div>
 
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" id="booking-form">
                         {% csrf_token %}
-                        <!-- общий partial с формой -->
-                        {% include "partials/_booking_form.html" %}
-                        <div class="d-flex gap-2 mt-3 justify-content-end">
+
+                        <!-- Показываем ошибки формы -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Пожалуйста, исправьте ошибки:</strong>
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar me-1"></i>Дата бронирования *
+                                    </label>
+                                    {{ form.date }}
+                                    {% if form.date.errors %}
+                                        <div class="text-danger small mt-1">{{ form.date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-users me-1"></i>Количество гостей *
+                                    </label>
+                                    {{ form.number_of_guests }}
+                                    {% if form.number_of_guests.errors %}
+                                        <div class="text-danger small mt-1">{{ form.number_of_guests.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-clock me-1"></i>Продолжительность *
+                                    </label>
+                                    {{ form.duration_hours }}
+                                    {% if form.duration_hours.errors %}
+                                        <div class="text-danger small mt-1">{{ form.duration_hours.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">От 1 до 4 часов</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-clock me-1"></i>Время начала *
+                                    </label>
+                                    {{ form.time }}
+                                    {% if form.time.errors %}
+                                        <div class="text-danger small mt-1">{{ form.time.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Часы работы: Каждый день 12:00-00:00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-utensils me-1"></i>Стол *
+                            </label>
+                            {{ form.table }}
+                            {% if form.table.errors %}
+                                <div class="text-danger small mt-1">{{ form.table.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">
+                                Выберите стол подходящей вместимости
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-comment me-1"></i>Особые пожелания
+                            </label>
+                            {{ form.special_requests }}
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <h6><i class="fas fa-info-circle me-2"></i>Информация о бронировании:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Часы работы:</strong> Пн-Чт 12:00-23:00, Пт-Вс 12:00-00:00</li>
+                                <li><strong>Продолжительность:</strong> от 1 до 4 часов</li>
+                                <li><strong>Бронирование:</strong> доступно на 3 месяца вперед</li>
+                                <li><strong>Отмена:</strong> возможна в любое время до начала бронирования</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4 justify-content-end">
                             <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-1"></i>Назад
                             </a>
-
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-1"></i>
                                 {% if form.instance.pk %}Сохранить изменения{% else %}Забронировать{% endif %}
                             </button>
                         </div>
                     </form>
-                </div>
-                <div class="card-footer bg-transparent">
-                    <small class="text-muted">Минимальная длительность: 1 час. Максимум 4 часа.</small>
                 </div>
             </div>
         </div>
