@@ -71,6 +71,10 @@ jobs:
           script: |
             set -e
             
+            echo "--- CREATE PROJECT DIRECTORY ---"
+            sudo mkdir -p /var/www
+            sudo chown $USER:$USER /var/www
+            
             echo "--- CLEAN OLD PROJECT ---"
             sudo rm -rf /var/www/Project7
             
