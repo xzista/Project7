@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from datetime import timedelta, datetime, time as dtime
+from datetime import timedelta, datetime
 
 class RestaurantTable(models.Model):
     TABLE_TYPES = [

@@ -7,10 +7,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=35, verbose_name='Телефон', help_text='Введите номер телефона')
     avatar = models.ImageField(upload_to='users/avatars/', blank=True, null=True, help_text='Загрузите свой аватар')
 
-    token = models.CharField(max_length=100, verbose_name='Token', blank=True, null=True,)
-
-    is_customer = models.BooleanField(default=True, verbose_name='Обычный пользователь')
-    is_restaurant_admin = models.BooleanField(default=False, verbose_name='Администратор ресторана')
+    token = models.CharField(max_length=100, verbose_name='Token', blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

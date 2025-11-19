@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from reservation.models import RestaurantTable
+from bookings.models import RestaurantTable
 from django.contrib.auth.models import Group, Permission
 
 class Command(BaseCommand):
