@@ -106,6 +106,9 @@ jobs:
             echo "--- WAIT FOR DATABASE ---"
             sleep 30
             
+            echo "--- CHECK CONTAINER LOGS ---"
+            sudo docker compose -f docker-compose.yaml logs web
+            
             echo "--- APPLY MIGRATIONS ---"
             sudo docker compose -f docker-compose.yaml exec -T web python manage.py migrate --noinput
             
