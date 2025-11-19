@@ -4,6 +4,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from datetime import timedelta, datetime
 
+# Константы часов работы ресторана
+RESTAURANT_HOURS = {
+    'weekday_open': '12:00',
+    'weekday_close': '23:00',
+    'weekend_open': '12:00',
+    'weekend_close': '00:00',
+}
+
 class RestaurantTable(models.Model):
     TABLE_TYPES = [
         ('2-seater', '2-местный столик'),
@@ -40,11 +48,23 @@ class Booking(models.Model):
         (STATUS_COMPLETED, "Завершено"),
     ]
 
+    DURATION_CHOICES = [
+        (1, "1 час"),
+        (2, "2 часа"),
+        (3, "3 часа"),
+        (4, "4 часа"),
+    ]
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookings", verbose_name="Пользователь")
     table = models.ForeignKey(RestaurantTable, on_delete=models.CASCADE, verbose_name="Стол")
     date = models.DateField(verbose_name="Дата")
     time = models.TimeField(verbose_name="Время")
-    duration_hours = models.PositiveIntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(4)], verbose_name="Продолжительность (часы)")
+    duration_hours = models.PositiveIntegerField(
+        choices=DURATION_CHOICES,
+        default=2,
+        validators=[MinValueValidator(1), MaxValueValidator(4)],
+        verbose_name="Продолжительность (часы)"
+    )
     number_of_guests = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(8)], verbose_name="Количество гостей")
     special_requests = models.TextField(blank=True, null=True, verbose_name="Особые пожелания")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_CREATED, verbose_name="Статус")
@@ -83,3 +103,54 @@ class Booking(models.Model):
     @property
     def can_be_cancelled(self):
         return self.status in [self.STATUS_CREATED, self.STATUS_CONFIRMED] and not self.is_past_due
+
+    @classmethod
+    def get_restaurant_hours(cls, date):
+        """Возвращает время открытия и закрытия для указанной даты"""
+        from datetime import time
+
+        # Проверяем день недели (0-понедельник, 6-воскресенье)
+        weekday = date.weekday()
+
+        if weekday in [4, 5, 6]:  # Пятница, суббота, воскресенье
+            open_time = time.fromisoformat(RESTAURANT_HOURS['weekend_open'])
+            close_time = time.fromisoformat(RESTAURANT_HOURS['weekend_close'])
+        else:  # Понедельник-четверг
+            open_time = time.fromisoformat(RESTAURANT_HOURS['weekday_open'])
+            close_time = time.fromisoformat(RESTAURANT_HOURS['weekday_close'])
+
+        return open_time, close_time
+
+    @classmethod
+    def get_available_time_slots(cls, date, duration_hours=1):
+        """Возвращает доступные временные слоты для бронирования"""
+        from datetime import time, datetime, timedelta
+
+        open_time, close_time = cls.get_restaurant_hours(date)
+
+        # Если закрытие в 00:00, это означает полночь следующего дня
+        if close_time.hour == 0:
+            close_time = time(23, 59)
+
+        # Генерируем слоты по 15 минут
+        slots = []
+        current_time = open_time
+
+        while True:
+            # Вычисляем время окончания брони
+            end_dt = datetime.combine(date, current_time) + timedelta(hours=duration_hours)
+            end_time = end_dt.time()
+
+            # Проверяем, что бронирование заканчивается до закрытия
+            if end_time <= close_time:
+                slots.append(current_time)
+
+            # Переходим к следующему слоту (+15 минут)
+            current_dt = datetime.combine(date, current_time) + timedelta(minutes=15)
+            current_time = current_dt.time()
+
+            # Прерываем если вышли за время закрытия
+            if current_time >= close_time:
+                break
+
+        return slots
