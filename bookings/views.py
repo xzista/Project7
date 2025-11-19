@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
+from django.utils.dateparse import parse_date
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -11,7 +12,8 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
 from .forms import BookingForm, BookingUpdateForm
-from .models import Booking
+from .models import Booking, RestaurantTable
+
 
 # Миксин для проверки прав администратора ресторана
 class RestaurantAdminRequiredMixin(UserPassesTestMixin):
@@ -63,9 +65,21 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
     form_class = BookingForm
     success_url = reverse_lazy("bookings:booking_list")
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        # Просто показываем все доступные столы
+        # Валидация конфликтов будет в форме
+        form.fields["table"].queryset = RestaurantTable.objects.filter(
+            is_available=True
+        ).order_by("capacity", "name")
+
+        return form
+
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.status = Booking.STATUS_CREATED
+
         response = super().form_valid(form)
         messages.success(self.request, "Бронирование успешно создано!")
         return response
@@ -83,13 +97,23 @@ class BookingUpdateView(LoginRequiredMixin, UpdateView):
             return qs
         return qs.filter(user=self.request.user)
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        # Просто показываем все доступные столы
+        # Валидация конфликтов будет в форме
+        form.fields["table"].queryset = RestaurantTable.objects.filter(
+            is_available=True
+        ).order_by("capacity", "name")
+
+        return form
+
     def form_valid(self, form):
-        if not form.instance.can_be_modified:
-            messages.error(self.request, "Это бронирование нельзя изменить.")
-            return redirect("bookings:booking_list")
+        form.instance.user = self.request.user
+        form.instance.status = Booking.STATUS_CREATED
 
         response = super().form_valid(form)
-        messages.success(self.request, "Бронирование успешно обновлено!")
+        messages.success(self.request, "Бронирование успешно создано!")
         return response
 
 
