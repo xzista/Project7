@@ -1,15 +1,16 @@
 import secrets
-from django.shortcuts import render, get_object_or_404, redirect
+
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import Group
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView
-from django.contrib import messages
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.models import Group
 
 from config.settings import EMAIL_HOST_USER
-from users.forms import UserRegisterForm, UserLoginForm, ProfileUpdateForm
+from users.forms import ProfileUpdateForm, UserLoginForm, UserRegisterForm
 from users.models import User
 
 
@@ -17,7 +18,7 @@ def register_view(request):
     """
     View для регистрации нового пользователя.
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserRegisterForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
@@ -28,7 +29,7 @@ def register_view(request):
 
             # Автоматически добавляем в группу Customers если она существует
             try:
-                customer_group = Group.objects.get(name='Customers')
+                customer_group = Group.objects.get(name="Customers")
                 user.groups.add(customer_group)
             except Group.DoesNotExist:
                 pass  # Если группы нет - ничего страшного
@@ -51,49 +52,48 @@ def register_view(request):
                 recipient_list=[user.email],
             )
 
-            messages.success(
-                request,
-                "Регистрация прошла успешно! Проверьте вашу почту для подтверждения email."
-            )
-            return redirect('home')
+            messages.success(request, "Регистрация прошла успешно! Проверьте вашу почту для подтверждения email.")
+            return redirect("home")
     else:
         form = UserRegisterForm()
 
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, "users/register.html", {"form": form})
 
 
 def login_view(request):
     """
     Кастомная view для входа пользователя.
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserLoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password')
+            email = form.cleaned_data.get("email")
+            password = form.cleaned_data.get("password")
             user = authenticate(request, email=email, password=password)
 
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    messages.success(request, f'Добро пожаловать, {user.email}!')
-                    next_url = request.GET.get('next', 'home')
+                    messages.success(request, f"Добро пожаловать, {user.email}!")
+                    next_url = request.GET.get("next", "home")
                     return redirect(next_url)
                 else:
-                    messages.error(request,
-                                   'Ваш аккаунт не активирован. Проверьте вашу почту для подтверждения email.')
+                    messages.error(
+                        request, "Ваш аккаунт не активирован. Проверьте вашу почту для подтверждения email."
+                    )
             else:
-                messages.error(request, 'Неверный email или пароль.')
+                messages.error(request, "Неверный email или пароль.")
     else:
         form = UserLoginForm()
 
-    return render(request, 'users/login.html', {'form': form})
+    return render(request, "users/login.html", {"form": form})
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """
     View для обновления профиля пользователя.
     """
+
     model = User
     form_class = ProfileUpdateForm
     template_name = "users/profile.html"

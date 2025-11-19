@@ -1,39 +1,39 @@
-from django.db import models
-from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.utils import timezone
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
-# Константы часов работы ресторана
+from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.utils import timezone
+
 RESTAURANT_HOURS = {
-    'weekday_open': '12:00',
-    'weekday_close': '23:00',
-    'weekend_open': '12:00',
-    'weekend_close': '00:00',
+    "weekend_open": "12:00",
+    "weekend_close": "00:00",
 }
+
 
 class RestaurantTable(models.Model):
     TABLE_TYPES = [
-        ('2-seater', '2-местный столик'),
-        ('4-seater', '4-местный столик'),
-        ('6-seater', '6-местный столик'),
-        ('8-seater', '8-местный столик'),
+        ("2-seater", "2-местный столик"),
+        ("4-seater", "4-местный столик"),
+        ("6-seater", "6-местный столик"),
+        ("8-seater", "8-местный столик"),
     ]
 
     TABLE_LOCATIONS = [
-        ('hall', 'Зал'),
-        ('terrace', 'Терраса'),
+        ("hall", "Зал"),
+        ("terrace", "Терраса"),
     ]
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Название стола")
     table_type = models.CharField(max_length=20, choices=TABLE_TYPES, verbose_name="Тип стола")
     capacity = models.PositiveIntegerField(verbose_name="Вместимость")
-    location = models.CharField(max_length=20, choices=TABLE_LOCATIONS, default='hall', verbose_name="Зона")
+    location = models.CharField(max_length=20, choices=TABLE_LOCATIONS, default="hall", verbose_name="Зона")
     is_available = models.BooleanField(default=True, verbose_name="Доступен")
     description = models.TextField(blank=True, null=True, verbose_name="Описание")
 
     def __str__(self):
         return f"{self.name} ({self.table_type})"
+
 
 class Booking(models.Model):
     STATUS_CREATED = "Создано"
@@ -55,7 +55,9 @@ class Booking(models.Model):
         (4, "4 часа"),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookings", verbose_name="Пользователь")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookings", verbose_name="Пользователь"
+    )
     table = models.ForeignKey(RestaurantTable, on_delete=models.CASCADE, verbose_name="Стол")
     date = models.DateField(verbose_name="Дата")
     time = models.TimeField(verbose_name="Время")
@@ -63,9 +65,11 @@ class Booking(models.Model):
         choices=DURATION_CHOICES,
         default=2,
         validators=[MinValueValidator(1), MaxValueValidator(4)],
-        verbose_name="Продолжительность (часы)"
+        verbose_name="Продолжительность (часы)",
     )
-    number_of_guests = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(8)], verbose_name="Количество гостей")
+    number_of_guests = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(8)], verbose_name="Количество гостей"
+    )
     special_requests = models.TextField(blank=True, null=True, verbose_name="Особые пожелания")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_CREATED, verbose_name="Статус")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
@@ -109,22 +113,21 @@ class Booking(models.Model):
         """Возвращает время открытия и закрытия для указанной даты"""
         from datetime import time
 
-        # Проверяем день недели (0-понедельник, 6-воскресенье)
         weekday = date.weekday()
 
-        if weekday in [4, 5, 6]:  # Пятница, суббота, воскресенье
-            open_time = time.fromisoformat(RESTAURANT_HOURS['weekend_open'])
-            close_time = time.fromisoformat(RESTAURANT_HOURS['weekend_close'])
-        else:  # Понедельник-четверг
-            open_time = time.fromisoformat(RESTAURANT_HOURS['weekday_open'])
-            close_time = time.fromisoformat(RESTAURANT_HOURS['weekday_close'])
+        if weekday in [4, 5, 6]:
+            open_time = time.fromisoformat(RESTAURANT_HOURS["weekend_open"])
+            close_time = time.fromisoformat(RESTAURANT_HOURS["weekend_close"])
+        else:
+            open_time = time.fromisoformat(RESTAURANT_HOURS["weekday_open"])
+            close_time = time.fromisoformat(RESTAURANT_HOURS["weekday_close"])
 
         return open_time, close_time
 
     @classmethod
     def get_available_time_slots(cls, date, duration_hours=1):
         """Возвращает доступные временные слоты для бронирования"""
-        from datetime import time, datetime, timedelta
+        from datetime import datetime, time, timedelta
 
         open_time, close_time = cls.get_restaurant_hours(date)
 

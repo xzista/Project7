@@ -1,43 +1,50 @@
+from datetime import date, timedelta
+
 from django import forms
-from datetime import date, timedelta, time
 
 from .models import Booking
 
 
 class BookingForm(forms.ModelForm):
     # Создаем кастомное поле для времени с выбором из списка
-    time = forms.ChoiceField(
-        choices=[],
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label="Время начала"
-    )
+    time = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}), label="Время начала")
 
     class Meta:
         model = Booking
         fields = ["table", "date", "time", "duration_hours", "number_of_guests", "special_requests"]
         widgets = {
-            "date": forms.DateInput(attrs={
-                "type": "date",
-                "class": "form-control",
-                "min": date.today().isoformat(),
-                "max": (date.today() + timedelta(days=90)).isoformat()
-            }),
-            "duration_hours": forms.Select(attrs={
-                "class": "form-control",
-            }),
-            "number_of_guests": forms.NumberInput(attrs={
-                "class": "form-control",
-                "min": 1,
-                "max": 20,
-            }),
-            "special_requests": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 4,
-                "placeholder": "Особые пожелания...",
-            }),
-            "table": forms.Select(attrs={
-                "class": "form-control",
-            }),
+            "date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "form-control",
+                    "min": date.today().isoformat(),
+                    "max": (date.today() + timedelta(days=90)).isoformat(),
+                }
+            ),
+            "duration_hours": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "number_of_guests": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": 1,
+                    "max": 20,
+                }
+            ),
+            "special_requests": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 4,
+                    "placeholder": "Особые пожелания...",
+                }
+            ),
+            "table": forms.Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -45,18 +52,19 @@ class BookingForm(forms.ModelForm):
 
         # Генерируем временные слоты по 15 минут
         time_slots = self.generate_time_slots()
-        self.fields['time'].choices = time_slots
+        self.fields["time"].choices = time_slots
 
         # Если это редактирование существующей брони, устанавливаем текущее время
         if self.instance and self.instance.pk and self.instance.time:
-            current_time = self.instance.time.strftime('%H:%M')
+            current_time = self.instance.time.strftime("%H:%M")
             if not any(current_time == choice[0] for choice in time_slots):
-                self.fields['time'].choices = [('', '--- Выберите время ---')] + [
-                    (current_time, current_time)] + time_slots[1:]
+                self.fields["time"].choices = (
+                    [("", "--- Выберите время ---")] + [(current_time, current_time)] + time_slots[1:]
+                )
 
     def generate_time_slots(self):
         """Генерирует временные слоты с шагом 15 минут"""
-        slots = [('', '--- Выберите время ---')]
+        slots = [("", "--- Выберите время ---")]
 
         # Часы работы
         start_hour, start_minute = 12, 0  # 12:00
@@ -84,10 +92,11 @@ class BookingForm(forms.ModelForm):
     def clean_time(self):
         time_val = self.cleaned_data["time"]
         # Преобразуем строку в time объект
-        if time_val and ':' in time_val:
+        if time_val and ":" in time_val:
             try:
                 from datetime import datetime
-                return datetime.strptime(time_val, '%H:%M').time()
+
+                return datetime.strptime(time_val, "%H:%M").time()
             except ValueError:
                 raise forms.ValidationError("Неверный формат времени")
         return time_val
@@ -102,21 +111,18 @@ class BookingForm(forms.ModelForm):
 
         # Проверка вместимости стола
         if table and number_of_guests and number_of_guests > table.capacity:
-            raise forms.ValidationError(
-                f"Выбранный стол вмещает максимум {table.capacity} гостей."
-            )
+            raise forms.ValidationError(f"Выбранный стол вмещает максимум {table.capacity} гостей.")
 
         # Проверка доступности стола
         if table and date_val and time_val and duration_hours:
             from datetime import datetime, timedelta
+
             new_start = datetime.combine(date_val, time_val)
             new_end = new_start + timedelta(hours=duration_hours)
 
             # Ищем конфликтующие брони
             conflicting_bookings = Booking.objects.filter(
-                table=table,
-                date=date_val,
-                status__in=[Booking.STATUS_CREATED, Booking.STATUS_CONFIRMED]
+                table=table, date=date_val, status__in=[Booking.STATUS_CREATED, Booking.STATUS_CONFIRMED]
             ).exclude(pk=self.instance.pk if self.instance else None)
 
             for existing in conflicting_bookings:
@@ -138,7 +144,6 @@ class BookingUpdateForm(BookingForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Для существующего бронирования показываем текущее время
         if self.instance and self.instance.pk:
-            current_time = self.instance.time.strftime('%H:%M')
+            current_time = self.instance.time.strftime("%H:%M")
             self.fields["time"].choices = [(current_time, current_time)]

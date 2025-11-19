@@ -1,4 +1,5 @@
 from django.urls import path
+
 from bookings import views
 from bookings.apps import BookingsConfig
 

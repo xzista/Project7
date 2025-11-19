@@ -1,24 +1,20 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
-from django.utils.dateparse import parse_date
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    UpdateView,
-)
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 
 from .forms import BookingForm, BookingUpdateForm
 from .models import Booking, RestaurantTable
 
 
-# Миксин для проверки прав администратора ресторана
 class RestaurantAdminRequiredMixin(UserPassesTestMixin):
+    """Миксин для проверки прав администратора ресторана"""
+
     def test_func(self):
-        return self.request.user.groups.filter(name='RestaurantAdmins').exists() or self.request.user.is_staff
+        return self.request.user.groups.filter(name="RestaurantAdmins").exists() or self.request.user.is_staff
+
 
 class BookingListView(LoginRequiredMixin, ListView):
     model = Booking
@@ -30,9 +26,8 @@ class BookingListView(LoginRequiredMixin, ListView):
         qs = Booking.objects.select_related("table", "user")
         user = self.request.user
 
-        if user.is_staff or user.groups.filter(name='RestaurantAdmins').exists():
+        if user.is_staff or user.groups.filter(name="RestaurantAdmins").exists():
             qs = qs.order_by("-date", "-time")
-            # фильтры из GET
             q_email = self.request.GET.get("email")
             q_phone = self.request.GET.get("phone")
             q_table = self.request.GET.get("table")
@@ -50,7 +45,6 @@ class BookingListView(LoginRequiredMixin, ListView):
             if q_date:
                 qs = qs.filter(date=q_date)
 
-            # сортировка (по параметру ?order=field or -field)
             order = self.request.GET.get("order")
             if order:
                 qs = qs.order_by(order)
@@ -68,11 +62,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
 
-        # Просто показываем все доступные столы
-        # Валидация конфликтов будет в форме
-        form.fields["table"].queryset = RestaurantTable.objects.filter(
-            is_available=True
-        ).order_by("capacity", "name")
+        form.fields["table"].queryset = RestaurantTable.objects.filter(is_available=True).order_by("capacity", "name")
 
         return form
 
@@ -93,27 +83,24 @@ class BookingUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.request.user.is_staff:
+        user = self.request.user
+        if user.is_staff or user.groups.filter(name="RestaurantAdmins").exists():
             return qs
-        return qs.filter(user=self.request.user)
+        return qs.filter(user=user)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-
-        # Просто показываем все доступные столы
-        # Валидация конфликтов будет в форме
-        form.fields["table"].queryset = RestaurantTable.objects.filter(
-            is_available=True
-        ).order_by("capacity", "name")
-
+        form.fields["table"].queryset = RestaurantTable.objects.filter(is_available=True).order_by("capacity", "name")
         return form
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.instance.status = Booking.STATUS_CREATED
+
+        if not form.instance.can_be_modified:
+            messages.error(self.request, "Это бронирование нельзя изменить.")
+            return redirect("bookings:booking_list")
 
         response = super().form_valid(form)
-        messages.success(self.request, "Бронирование успешно создано!")
+        messages.success(self.request, "Бронирование успешно обновлено!")
         return response
 
 

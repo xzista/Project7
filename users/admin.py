@@ -16,4 +16,7 @@ class UserAdmin(admin.ModelAdmin):
         "email",
         "is_active",
     )
-    search_fields = ("email", "phone",)
+    search_fields = (
+        "email",
+        "phone",
+    )

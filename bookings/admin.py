@@ -1,11 +1,14 @@
 from django.contrib import admin
-from .models import RestaurantTable, Booking
+
+from .models import Booking, RestaurantTable
+
 
 @admin.register(RestaurantTable)
 class RestaurantTableAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "table_type", "capacity", "location", "is_available")
     list_filter = ("table_type", "location", "is_available")
     search_fields = ("name",)
+
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
@@ -16,18 +19,22 @@ class BookingAdmin(admin.ModelAdmin):
 
     def user_email(self, obj):
         return obj.user.email
+
     user_email.short_description = "Email"
 
     def user_phone(self, obj):
         return obj.user.phone
+
     user_phone.short_description = "Phone"
 
     def confirm_bookings(self, request, queryset):
         updated = queryset.update(status=Booking.STATUS_CONFIRMED)
         self.message_user(request, f"{updated} бронирований подтверждено.")
+
     confirm_bookings.short_description = "Подтвердить выбранные брони"
 
     def cancel_bookings(self, request, queryset):
         updated = queryset.update(status=Booking.STATUS_CANCELLED)
         self.message_user(request, f"{updated} бронирований отменено.")
+
     cancel_bookings.short_description = "Отменить выбранные брони"
