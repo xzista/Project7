@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Бронирование #{{ booking.pk }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card culinary-card glass-effect shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Бронирование — {{ booking.table.name }} - {{ booking.user }}</h4>
+                    {% include "partials/_status_badge.html" with status=booking.status %}
+                </div>
+
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">Дата</p>
+                            <h5>{{ booking.date }}</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">Время</p>
+                            <h5>{{ booking.time }} ({{ booking.duration_hours }} ч)</h5>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">Гостей</p>
+                            <h5>{{ booking.number_of_guests }}</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">Зона / Тип стола</p>
+                            <h5>{{ booking.table.get_table_type_display }} — {{ booking.table.get_location_display }}</h5>
+                        </div>
+                    </div>
+
+                    {% if booking.special_requests %}
+                        <div class="mb-3">
+                            <p class="mb-1 text-muted">Особые пожелания</p>
+                            <div class="p-3 bg-body-tertiary rounded">{{ booking.special_requests }}</div>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Назад
+                        </a>
+
+                        {% if booking.can_be_modified %}
+                            <a href="{% url 'bookings:booking_form' booking.pk %}" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>Перенести
+                            </a>
+                        {% endif %}
+
+                        {% if booking.can_be_cancelled %}
+                            <form method="post" action="{% url 'bookings:booking_delete' booking.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-times me-1"></i>Отменить
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if user.is_staff and booking.status == 'Создано' %}
+                            <a href="{% url 'bookings:booking_confirm' booking.pk %}" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i>Подтвердить
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <small class="text-muted">Бронирование создано: {{ booking.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

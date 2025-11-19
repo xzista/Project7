@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Регистрация - Le Jardin Secret{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="card-title mb-0 text-center">
+                        <i class="fas fa-user-plus me-2"></i>Регистрация
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.email|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        {{ form.avatar|as_crispy_field }}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.password1|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.password2|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <h6><i class="fas fa-info-circle me-2"></i>Важная информация:</h6>
+                            <ul class="mb-0">
+                                <li>После регистрации вам будет отправлено письмо для подтверждения email</li>
+                                <li>Только после подтверждения email вы сможете войти в систему</li>
+                                <li>Ваш пароль должен содержать минимум 8 символов</li>
+                                <li>Поле "Телефон" и "Аватар" не являются обязательными</li>
+                            </ul>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 mt-3">
+                            <i class="fas fa-user-plus me-2"></i>Зарегистрироваться
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Уже есть аккаунт?
+                            <a href="{% url 'users:login' %}" class="text-decoration-none">Войдите в систему</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

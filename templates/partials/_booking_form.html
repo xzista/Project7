@@ -1,0 +1,33 @@
+{# partial: шаблон формы бронирования #}
+{% load crispy_forms_tags %}
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        {{ form.date|as_crispy_field }}
+    </div>
+
+    <div class="col-md-6">
+        {{ form.time|as_crispy_field }}
+    </div>
+
+    <div class="col-md-6">
+        {{ form.table|as_crispy_field }}
+        <small class="text-muted d-block mt-1">
+            Выберите доступный стол. Если не видите нужный стол — смените дату/время.
+        </small>
+    </div>
+
+    <div class="col-md-6">
+        {{ form.number_of_guests|as_crispy_field }}
+    </div>
+
+    <div class="col-md-6">
+        {{ form.duration_hours|as_crispy_field }}
+    </div>
+
+    <div class="col-12">
+        {{ form.special_requests|as_crispy_field }}
+    </div>
+
+</div>

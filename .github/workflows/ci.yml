@@ -1,0 +1,121 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry config virtualenvs.create false
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-ansi
+
+      - name: Run migrations
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY_TEST }}
+          POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          DEBUG: True
+        run: |
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            
+            echo "--- CREATE PROJECT DIRECTORY ---"
+            sudo mkdir -p /var/www
+            sudo chown $USER:$USER /var/www
+            
+            echo "--- CLEAN OLD PROJECT ---"
+            sudo rm -rf /var/www/Project7
+            
+            echo "--- CLONE FRESH REPOSITORY ---"
+            cd /var/www
+            git clone https://github.com/xzista/Project7.git Project7
+            cd Project7
+            
+            echo "--- CREATE .env FILE ---"
+            cat > .env << EOF
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            DEBUG=${{ secrets.DEBUG }}
+            POSTGRES_DB=${{ secrets.POSTGRES_NAME }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_HOST=db
+            POSTGRES_PORT=5432
+            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+            EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
+            EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
+            EOF
+            
+            echo "--- CLEAN DOCKER ---"
+            sudo docker system prune -af --volumes
+            
+            echo "--- BUILD AND START CONTAINERS ---"
+            sudo docker compose -f docker-compose.yaml down || true
+            sudo docker compose -f docker-compose.yaml build --no-cache
+            sudo docker compose -f docker-compose.yaml up -d
+            
+            echo "--- WAIT FOR DATABASE ---"
+            sleep 30
+            
+            echo "--- CHECK CONTAINER LOGS ---"
+            sudo docker compose -f docker-compose.yaml logs web
+            
+            echo "--- APPLY MIGRATIONS ---"
+            sudo docker compose -f docker-compose.yaml exec -T web python manage.py migrate --noinput
+            
+            echo "--- CHECK DEPLOYMENT ---"
+            sleep 10
+            curl -f http://localhost || echo "Service check failed but continuing..."
+            
+            echo "--- DEPLOYMENT COMPLETE ---"

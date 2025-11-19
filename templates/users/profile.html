@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Профиль - Le Jardin Secret{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="card-title mb-0 text-center">
+                        <i class="fas fa-user-circle me-2"></i>Мой профиль
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle img-fluid" style="max-width: 150px;">
+                            {% else %}
+                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                                    <i class="fas fa-user fa-3x text-light"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h5>{{ user.email }}</h5>
+                            {% if user.phone %}
+                                <p><i class="fas fa-phone me-2"></i>{{ user.phone }}</p>
+                            {% endif %}
+                            {% if user.country %}
+                                <p><i class="fas fa-globe me-2"></i>{{ user.country }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-save me-2"></i>Сохранить изменения
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
