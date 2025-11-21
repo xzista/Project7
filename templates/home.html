@@ -132,36 +132,44 @@
 
         <div class="row g-3">
             <div class="col-md-3">
-                <div class="culinary-card rounded overflow-hidden">
-                    <div class="bg-primary text-white p-3 text-center">
-                        <i class="fas fa-drumstick-bite fa-2x"></i>
-                        <h6 class="mt-2 mb-0">Утка по-бургундски</h6>
+                <a href="{% url 'menu:dish_detail' 11 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-primary text-white p-3 text-center">
+                            <i class="fas fa-drumstick-bite fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Утка по-бургундски</h6>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="culinary-card rounded overflow-hidden">
-                    <div class="bg-success text-white p-3 text-center">
-                        <i class="fas fa-fish fa-2x"></i>
-                        <h6 class="mt-2 mb-0">Тунец с трюфелями</h6>
+                <a href="{% url 'menu:dish_detail' 12 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-success text-white p-3 text-center">
+                            <i class="fas fa-fish fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Тунец с трюфелями</h6>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="culinary-card rounded overflow-hidden">
-                    <div class="bg-warning text-dark p-3 text-center">
-                        <i class="fas fa-cheese fa-2x"></i>
-                        <h6 class="mt-2 mb-0">Сырное ассорти</h6>
+                <a href="{% url 'menu:dish_detail' 1 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-warning text-dark p-3 text-center">
+                            <i class="fas fa-cheese fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Сырное ассорти</h6>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="culinary-card rounded overflow-hidden">
-                    <div class="bg-danger text-white p-3 text-center">
-                        <i class="fas fa-ice-cream fa-2x"></i>
-                        <h6 class="mt-2 mb-0">Крем-брюле</h6>
+                <a href="{% url 'menu:dish_detail' 16 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-danger text-white p-3 text-center">
+                            <i class="fas fa-ice-cream fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Крем-брюле</h6>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="text-center mt-4">
                 <a href="{% url 'menu:dish_list' %}" class="btn btn-lg btn-primary px-4">
