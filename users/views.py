@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView
 
-from config.settings import EMAIL_HOST_USER
+from config.settings import EMAIL_HOST_USER, SITE_URL
 from users.forms import ProfileUpdateForm, UserLoginForm, UserRegisterForm
 from users.models import User
 
@@ -32,11 +32,10 @@ def register_view(request):
                 customer_group = Group.objects.get(name="Customers")
                 user.groups.add(customer_group)
             except Group.DoesNotExist:
-                pass  # Если группы нет - ничего страшного
+                pass
 
             # Отправка email для подтверждения
-            host = request.get_host()
-            url = f"http://{host}/users/email-confirm/{token}"
+            url = f"{SITE_URL}/users/email-confirm/{token}"
             send_mail(
                 subject="Подтверждение почты - Le Jardin Secret",
                 message=f"""Добро пожаловать в Le Jardin Secret!
