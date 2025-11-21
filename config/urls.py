@@ -27,6 +27,8 @@ urlpatterns = [
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     path("users/", include("users.urls", namespace="users")),
     path("bookings/", include("bookings.urls", namespace="bookings")),
+    path("menu/", include("menu.urls", namespace="menu")),
+    path("reviews/", include("reviews.urls", namespace="reviews")),
 ]
 
 if settings.DEBUG:
