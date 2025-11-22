@@ -138,9 +138,15 @@ class BookingDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         qs = super().get_queryset().select_related("table", "user")
-        if self.request.user.is_staff:
+        user = self.request.user
+
+        if user.is_staff or user.groups.filter(name="RestaurantAdmins").exists():
             return qs
-        return qs.filter(user=self.request.user)
+
+        if user.has_perm("bookings.view_booking"):
+            return qs
+
+        return qs.filter(user=user)
 
 
 def confirm_booking(request, pk):

@@ -46,13 +46,13 @@
                         <a href="{% url 'bookings:booking_list' %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i>Назад
                         </a>
-
+                        <!--
                         {% if booking.can_be_modified %}
                             <a href="{% url 'bookings:booking_form' booking.pk %}" class="btn btn-warning">
                                 <i class="fas fa-edit me-1"></i>Перенести
                             </a>
                         {% endif %}
-
+                        -->
                         {% if booking.can_be_cancelled %}
                             <form method="post" action="{% url 'bookings:booking_delete' booking.pk %}" style="display:inline;">
                                 {% csrf_token %}

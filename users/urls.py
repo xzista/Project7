@@ -26,7 +26,11 @@ urlpatterns = [
             template_name="users/password_reset.html",
             email_template_name="users/password_reset_email.txt",  # текстовое письмо
             subject_template_name="users/password_reset_subject.txt",
-            success_url=reverse_lazy("users:password_reset_done"),  # редирект после отправки письма
+            success_url=reverse_lazy("users:password_reset_done"),
+            extra_email_context={
+                "domain": "84.252.132.229",
+                "protocol": "http",
+            },
         ),
         name="password_reset",
     ),
