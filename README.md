@@ -9,7 +9,7 @@
 
 ## 📂 Структура проекта
 ```
-Project7/
+Website-for-booking-tables-in-restaurant/
 ├── .github/
 │   └── workflow/
 │       └── ci.yml
@@ -78,8 +78,8 @@ Project7/
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/xzista/Project7.git 
-cd project2
+git clone https://github.com/xzista/Website-for-booking-tables-in-restaurant.git 
+cd project7
 ```
 2. Установите зависимости:
 ```bash
@@ -111,7 +111,7 @@ python manage.py runserver
    - Клонировать проект:
    ```
    cd /opt
-   sudo git clone https://github.com/xzista/Project7.git Project7
+   sudo git clone https://github.com/xzista/Website-for-booking-tables-in-restaurant.git Project7
    cd education-platform
    ```
    - Создать .env на основе шаблона:
