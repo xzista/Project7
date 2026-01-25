@@ -1,0 +1,13 @@
+{# usage: {% include "partials/_status_badge.html" with status=booking.status %} #}
+{% load static %}
+{% if status == "Подтверждено" %}
+    <span class="badge bg-success">Подтверждено</span>
+{% elif status == "Создано" %}
+    <span class="badge bg-warning text-dark">Создано</span>
+{% elif status == "Отменено" %}
+    <span class="badge bg-danger">Отменено</span>
+{% elif status == "Завершено" %}
+    <span class="badge bg-secondary">Завершено</span>
+{% else %}
+    <span class="badge bg-light text-dark">{{ status }}</span>
+{% endif %}

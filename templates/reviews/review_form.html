@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Оставить отзыв{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card glass-effect p-4">
+        <div class="card-body">
+          <h3>Оставить отзыв</h3>
+          <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="d-flex justify-content-end mt-3">
+              <a href="{% url 'reviews:review_list' %}" class="btn btn-outline-secondary me-2">Отмена</a>
+              <button class="btn btn-primary">Отправить</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

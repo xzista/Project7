@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Le Jardin Secret - Изысканная французская кухня{% endblock %}
+
+{% block content %}
+<!-- Герой секция -->
+<section class="hero-gradient text-white py-5 theme-transition">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4">Le Jardin Secret</h1>
+                <p class="lead mb-4">Тайный сад вкусов, где каждая деталь рассказывает историю французской гастрономии</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'bookings:booking_form' %}" class="btn btn-light btn-lg px-4 py-2 floating-animation">
+                        <i class="fas fa-calendar-plus me-2"></i>Забронировать столик
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:register' %}" class="btn btn-light btn-lg px-4 py-2 floating-animation">
+                        <i class="fas fa-user-plus me-2"></i>Присоединиться к нам
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="glass-effect rounded-circle p-4 d-inline-block mt-4 mt-lg-0">
+                    <i class="fas fa-utensils fa-8x text-white floating-animation"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- История ресторана с фоновым изображением -->
+<section id="about" class="py-5 position-relative overflow-hidden theme-transition" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{% static 'images/photo.png' %}') center/cover no-repeat fixed; min-height: 100vh; display: flex; align-items: center;">
+    <div class="container position-relative z-1">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-4 fw-bold mb-5 text-white">Наша История</h2>
+
+                <div class="row text-start">
+                    <div class="col-md-6 timeline-item mb-4">
+                        <div class="card culinary-card h-100 glass-effect text-white">
+                            <div class="card-body">
+                                <h4 class="text-warning">1985</h4>
+                                <h5>Рождение мечты</h5>
+                                <p>Шеф-повар Пьер Дюбуа открыл небольшое кафе в Париже, где впервые представил свои уникальные рецепты, передаваемые в семье из поколения в поколение.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 timeline-item mb-4">
+                        <div class="card culinary-card h-100 glass-effect text-white">
+                            <div class="card-body">
+                                <h4 class="text-warning">1998</h4>
+                                <h5>Мировое признание</h5>
+                                <p>Le Jardin Secret получает первую звезду Мишлен. Наши блюда покоряют сердца гурманов со всего мира своей аутентичностью и изысканностью.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 timeline-item mb-4">
+                        <div class="card culinary-card h-100 glass-effect text-white">
+                            <div class="card-body">
+                                <h4 class="text-warning">2010</h4>
+                                <h5>Новая глава</h5>
+                                <p>Ресторан переезжает в историческое здание XIX века, где каждая деталь интерьера рассказывает свою собственную историю французского искусства.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 timeline-item mb-4">
+                        <div class="card culinary-card h-100 glass-effect text-white">
+                            <div class="card-body">
+                                <h4 class="text-warning">2025</h4>
+                                <h5>Современная классика</h5>
+                                <p>Сохраняя традиции, мы внедряем инновации. Сегодня Le Jardin Secret - это синтез вековых рецептов и современных гастрономических тенденций.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Особенности -->
+<section class="py-5 theme-transition" id="features">
+    <div class="container">
+        <h2 class="display-4 fw-bold text-center mb-5">Почему выбирают нас</h2>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card culinary-card h-100 border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-wrapper mb-3">
+                            <i class="fas fa-seedling fa-3x text-success floating-animation"></i>
+                        </div>
+                        <h4 class="card-title">Фермерские продукты</h4>
+                        <p class="card-text">Мы работаем только с локальными фермерами, чтобы гарантировать свежесть и качество каждого ингредиента.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card culinary-card h-100 border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-wrapper mb-3">
+                            <i class="fas fa-wine-bottle fa-3x text-warning floating-animation"></i>
+                        </div>
+                        <h4 class="card-title">Эксклюзивная винная карта</h4>
+                        <p class="card-text">Более 500 наименований вин из лучших винодельческих регионов Франции и мира.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card culinary-card h-100 border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-wrapper mb-3">
+                            <i class="fas fa-user-tie fa-3x text-info floating-animation"></i>
+                        </div>
+                        <h4 class="card-title">Мишленовский шеф</h4>
+                        <p class="card-text">Шеф-повар с 30-летним опытом создает блюда, которые становятся произведением искусства.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Галерея блюд -->
+<section id="menu" class="py-5 bg-body-tertiary theme-transition">
+    <div class="container">
+        <h2 class="display-4 fw-bold text-center mb-5">Шедевры нашей кухни</h2>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <a href="{% url 'menu:dish_detail' 11 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-primary text-white p-3 text-center">
+                            <i class="fas fa-drumstick-bite fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Утка по-бургундски</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'menu:dish_detail' 12 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-success text-white p-3 text-center">
+                            <i class="fas fa-fish fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Тунец с трюфелями</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'menu:dish_detail' 1 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-warning text-dark p-3 text-center">
+                            <i class="fas fa-cheese fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Сырное ассорти</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'menu:dish_detail' 16 %}">
+                    <div class="culinary-card rounded overflow-hidden">
+                        <div class="bg-danger text-white p-3 text-center">
+                            <i class="fas fa-ice-cream fa-2x"></i>
+                            <h6 class="mt-2 mb-0">Крем-брюле</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="text-center mt-4">
+                <a href="{% url 'menu:dish_list' %}" class="btn btn-lg btn-primary px-4">
+                    <i class="fas fa-utensils me-2"></i> Смотреть всё меню
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA секция -->
+<section class="py-5 hero-gradient-dark text-white theme-transition">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-4">Готовы к гастрономическому путешествию?</h2>
+        <p class="lead mb-4">Забронируйте столик и окунитесь в мир изысканной французской кухни</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'bookings:booking_form' %}" class="btn btn-light btn-lg px-5">
+                <i class="fas fa-calendar-check me-2"></i>Забронировать сейчас
+            </a>
+        {% else %}
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'users:register' %}" class="btn btn-light btn-lg px-5">
+                    <i class="fas fa-user-plus me-2"></i>Создать аккаунт
+                </a>
+                <a href="{% url 'users:login' %}" class="btn btn-outline-light btn-lg px-5">
+                    <i class="fas fa-sign-in-alt me-2"></i>Войти
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Отзывы -->
+<section id="reviews" class="py-5 theme-transition">
+    <div class="container">
+        <h2 class="display-4 fw-bold text-center mb-5">Отзывы гостей</h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 culinary-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user-circle fa-2x text-muted me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Анна Петрова</h6>
+                                <small class="text-muted">Ресторанный критик</small>
+                            </div>
+                        </div>
+                        <p class="card-text">"Le Jardin Secret - это не просто ресторан, это гастрономический театр, где каждое блюдо - акт, а каждый вкус - эмоция."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 culinary-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user-circle fa-2x text-muted me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Мишель Флоранс</h6>
+                                <small class="text-muted">Шеф-повар из Лиона</small>
+                            </div>
+                        </div>
+                        <p class="card-text">"Аутентичная французская кухня в лучших традициях. Чувствуется рука мастера и любовь к каждому ингредиенту."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 culinary-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user-circle fa-2x text-muted me-3"></i>
+                            <div>
+                                <h6 class="mb-0">Екатерина Смирнова</h6>
+                                <small class="text-muted">Постоянный гость</small>
+                            </div>
+                        </div>
+                        <p class="card-text">"Идеальное место для особых случаев. Атмосфера, сервис и, конечно, кухня - все на высочайшем уровне."</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="{% url 'reviews:review_list' %}" class="btn btn-lg btn-outline-primary px-4">
+                    <i class="fas fa-comments me-2"></i> Смотреть все отзывы
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

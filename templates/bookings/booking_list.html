@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои бронирования{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Мои бронирования</h1>
+    <a href="{% url 'bookings:booking_form' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Новое бронирование
+    </a>
+</div>
+
+{% if bookings %}
+    <div class="row">
+        {% for booking in bookings %}
+            <div class="col-md-6 mb-4">
+                <div class="card {% if booking.status == 'Отменено' %}bg-light{% elif booking.status == 'Завершено' %}border-success{% elif booking.status == 'Подтверждено' %}border-primary{% endif %}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Стол: {{ booking.table.name }}</h5>
+                        <span class="badge
+                            {% if booking.status == 'Подтверждено' %}bg-success
+                            {% elif booking.status == 'Создано' %}bg-warning
+                            {% elif booking.status == 'Отменено' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ booking.status }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Дата:</strong> {{ booking.date }}</p>
+                        <p><strong>Время:</strong> {{ booking.time }}</p>
+                        <p><strong>Гостей:</strong> {{ booking.number_of_guests }}</p>
+                        <p><strong>Стол:</strong> {{ booking.table.get_table_type_display }}</p>
+
+                        <div class="btn-group mt-3">
+                            <a href="{% url 'bookings:booking_detail' booking.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye"></i> Подробнее
+                            </a>
+                            <!--
+                            {% if booking.can_be_modified %}
+                                <a href="{% url 'bookings:booking_form' booking.pk %}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Перенести
+                                </a>
+                            {% endif %}
+                            -->
+                            {% if booking.can_be_cancelled %}
+                                <a href="{% url 'bookings:booking_delete' booking.pk %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-times"></i> Отменить
+                                </a>
+                            {% endif %}
+
+                            {% if user.is_staff and booking.status == 'Создано' %}
+                                <a href="{% url 'bookings:booking_confirm' booking.pk %}" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-check"></i> Подтвердить
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+        <h3>У вас пока нет бронирований</h3>
+        <p class="text-muted">Забронируйте свой первый столик в нашем ресторане</p>
+        <a href="{% url 'bookings:booking_form' %}" class="btn btn-primary">Забронировать стол</a>
+    </div>
+{% endif %}
+{% endblock %}
